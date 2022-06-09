@@ -1,6 +1,5 @@
 runtime: nodejs16
 
-//unix sockets
 beta_settings:
 cloud_sql_instances: newkoo0901:us-central1:princekook
 
