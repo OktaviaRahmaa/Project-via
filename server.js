@@ -8,9 +8,24 @@ app.listen(port, () => {
     console.log(`Prince Rest API listening on port ${port}`);
 });
 
+const pool = mysql.createPool({
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    socketPath: `/cloudsql/&{process.env.INSTANCE_CONNECTION_NAME}`,
+});
+
 app.get("/", async (req, res) => {
+    const query = "SELECT * FROM looks WHERE name = ?";
+    poll.query(query, [ req.params.look ], (error, results) => {
+        if (!results[0]) {
+            res.json({ status: "Not found"});
+        } else {
+            res.json(results[0]);
+        }
+    });
     // res.json({ status: "Hei Princess! Ready to roll!!"});
-    res.json({ query: 'select name from looks;'});
+    // res.json({ query: 'select name from looks;'});
 });
 
 app.get("/:look", async (req, res) => {
@@ -24,12 +39,7 @@ app.get("/:look", async (req, res) => {
     });
 });
 
-const pool = mysql.createPool({
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    socketPath: `/cloudsql/&{process.env.INSTANCE_CONNECTION_NAME}`,
-});
+
 
 const createUnixSocketPool = async (config) => {
    const dbSocketPath = process.env.DB_SOCKET_PATH || "/cloudsql"
